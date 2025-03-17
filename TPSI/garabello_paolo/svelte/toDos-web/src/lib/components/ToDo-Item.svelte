@@ -4,9 +4,10 @@
     import Icon from "./Icon.svelte";
     import Priority from "./Priority.svelte";
 
-    const { todo } = $props();
+    const { todo = $bindable() } = $props();
 
     const toggleStatus = () => {
+        console.log("caio");
         todo.done = !todo.done;
         item_change('update');
     }
@@ -49,10 +50,10 @@
         id="{todo.id}"
         placeholder="Inserisci il nuovo ToDO"
         bind:value={todo.task}
-        on:change={editTask}>
+        onchange={editTask}>
 </Cell>
 <Cell>
-    <Priority disabled={todo.done}/>
+    <Priority bind:priority={todo.priority} disabled={todo.done}/>
 </Cell>
 <Cell last>
     <Icon name="delete_forever" handler={() => item_change('delete')} color="red"/>

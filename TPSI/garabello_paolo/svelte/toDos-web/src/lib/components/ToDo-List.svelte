@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import Icon from "./Icon.svelte";
     import ToDoItem from "./ToDo-Item.svelte";
-    let todos = [];
+    let todos = $state([]);
     let last_id = 0;
 
     const createTodo = async () => {
@@ -18,16 +18,34 @@
         todos = [...todos, todo];
     }
     const change_todo_item = async (e) => {
-        delete_item(e.detail.id);
+        switch(e.detail.type) {
+            case 'update':
+                update_item(e.detail.id)
+                break;
+            case 'delete':
+                delete_item(e.detail.id);
+                break;
+        }
     }
     const delete_item = (id) => {
         console.log("DELETE", id);
         todos = todos.filter(t => t.id != id);
+        localStorage.removeItem(`todo${id}`);
     } 
+
+    const update_item = (id) => {
+        const todo = todos.filter(t => t.id == id)[0];
+        localStorage.setItem(`todo${id}`, JSON.stringify(todo));
+    }
 
     onMount(async () => {
         for(let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
+            const keyn = +key.substring(4);
+
+            if(keyn >= last_id)
+                last_id = keyn;
+            
             const todo = JSON.parse(localStorage.getItem(key));
             if(todo != null) 
                 todos.push(todo)
@@ -44,7 +62,7 @@
     <div class="header"><Icon name="schedule"/></div>
     <div class="header header-last"><Icon name="add_box" handler={createTodo}/></div>
     {#each todos as todo}
-        <ToDoItem todo={todo} on:change={change_todo_item}/>
+        <ToDoItem bind:todo={todos[todos.indexOf(todo)]} on:change={change_todo_item}/>
     {/each}
 </div>
 

@@ -1,6 +1,5 @@
 <script>
-    export let priority = 3;
-    export let disabled = false;
+    let {priority = $bindable(3), disabled = false} = $props();
 
     const prio2str = (priority) => {
         let map = {
